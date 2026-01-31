@@ -36,7 +36,7 @@ Wireframes for these screens are included in the milestone submission.
 
 # Project milestones
 
-# Milestone 1
+## Milestone 1
 Project idea selection
 Wireframes
 GitHub repository setup
