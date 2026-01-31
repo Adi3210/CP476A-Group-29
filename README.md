@@ -35,9 +35,12 @@ Change ticket status and priority
 # Screens / Wireframes
 
 The system contains the following main screens:
-  Ticket List (Home)
-	Create Ticket
-	Ticket Details (View / Edit ticket information and comments)
+
+Ticket List (Home)
+
+Create Ticket
+
+Ticket Details (View / Edit ticket information and comments)
 
 Wireframes for these screens are included in the milestone submission.
 
@@ -45,7 +48,11 @@ Wireframes for these screens are included in the milestone submission.
 
 ## Milestone 1
 Project idea selection
+
 Wireframes
+
 GitHub repository setup
+
 GitHub Projects Kanban board
+
 Initial task assignment
