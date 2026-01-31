@@ -3,10 +3,14 @@
 # Project Description: 
 Teams, small businesses, and student groups often lack a simple and centralized system to manage internal issues, tasks, and support requests.
 As a result, they frequently rely on:
-  Email threads that become difficult to track and manage
-	Spreadsheets that do not support notifications or workflow management
-	Messaging platforms (such as Slack or Discord) where requests are easily lost in conversations
-	Physical boards that are not accessible to remote members
+
+Email threads that become difficult to track and manage
+
+Spreadsheets that do not support notifications or workflow management
+
+Messaging platforms (such as Slack or Discord) where requests are easily lost in conversations
+
+Physical boards that are not accessible to remote members
 
 This leads to lost requests, unclear ownership, poor prioritization, and limited visibility into progress.
 
