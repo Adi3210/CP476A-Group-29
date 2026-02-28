@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ticketing System | Dashboard</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Dashboard</h1>
+    <nav class="nav">
+      <a href="../index.html">Logout</a>
+      <a class="btn small primary" href="./create-ticket.html">+ New Ticket</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>My Tickets (Mock Data)
+      </h2>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Ticket #</th>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Updated</th>
+          </tr>
+        </thead>
+        <tbody id="ticketsBody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="../js/app.js"></script>
+</body>
+</html>
