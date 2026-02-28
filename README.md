@@ -67,5 +67,5 @@ Teams, small businesses, and student groups often lack a simple, centralized sys
 
 ## Milestone 2 team work
 - Front-end workflow updates and validation: Sara Aljaafari
-- Database schema + SQL constraints: Efetobore Salubi
-- Backend route skeleton and server setup: Amelie Chu Moy Sang
+- Database schema + SQL constraints: Amelie Chu Moy Sang
+- Backend route skeleton and server setup: Efetobore Salubi
