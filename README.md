@@ -1,111 +1,71 @@
-# CP476A - Project - Group 29
+# CP476A Group 29 - Ticketing System
 
-Course project for CP476A. This repo holds the planning and code for a
-ticket/booking system.
+Help Desk / Ticketing System project for `CP476A - Internet Computing (Winter 2026)`.
 
-# Project Description:
-
-Teams, small businesses, and student groups often lack a simple and centralized system to manage internal issues, tasks, and support requests.
-As a result, they frequently rely on:
-
-Email threads that become difficult to track and manage
-
-Spreadsheets that do not support notifications or workflow management
-
-Messaging platforms (such as Slack or Discord) where requests are easily lost in conversations
-
-Physical boards that are not accessible to remote members
-
-This leads to lost requests, unclear ownership, poor prioritization, and limited visibility into progress.
-
-The Help Desk / Ticketing System aims to provide a lightweight, web-based solution for submitting, tracking, and managing requests in one centralized platform.
-
-# Team Members & Roles
-
-Sara Aljaafari - Wireframes, GitHub setup, project coordination
-
-Amelie Chu Moy Sang - Project proposal, Team Plan
-
-Efetobore Salubi - User stories, Data Planning
-
-# Main features
-
-View list of all support tickets
-
-Create a new support ticket
-
-View ticket details
-
-Add comments to a ticket
-
-Assign an agent to a ticket
-
-Change ticket status and priority
-
-# Screens / Wireframes
-
-The system contains the following main screens:
-
-Ticket List (Home)
-
-Create Ticket
-
-Ticket Details (View / Edit ticket information and comments)
-
-Wireframes for these screens are included in the milestone submission.
-
-# Repo Structure (Milestone 1)
-
-Basic folders are in place for upcoming development:
-
-- `frontend/` - UI client
-- `backend/` - API + data access
-- `docs/` - planning artifacts
-
-# Planning Artifacts
-
-Milestone 1 user stories and data planning are in:
-
-- `docs/milestone1.txt`
-
-# How to run locally
-
-Basic steps to run the project on your machine (per Milestone 02 requirements).
-
-**Front-end**
-
-- Open the front-end in a browser: from the repo root, open `frontend/index.html` (or the main entry file) in a browser, or run a local static server from the `frontend/` directory (e.g. `npx serve frontend` or your course-approved method).
-- If the front-end uses a build step, run the documented command from `frontend/` (e.g. `npm install` then `npm start` or `npm run dev`).
-
-**Back-end**
-
-- From the repo root: `cd backend`.
-- Install dependencies (e.g. `npm install` for Node.js, or the equivalent for PHP).
-- Start the server (e.g. `npm start` or `node server.js` for Node; `php -S localhost:8000` or your project’s command for PHP).
-- The README in `backend/` or the project docs may specify the port and any environment variables.
-
-# Project milestones
+## Team
+- Sara Aljaafari
+- Amelie Chu Moy Sang
+- Efetobore Salubi
 
 ## Milestone 1
+### Project description
+Teams, small businesses, and student groups often lack a simple, centralized system to manage internal issues and support requests. This project provides a lightweight web-based ticketing platform.
 
-Project idea selection
+### Main features
+- View list of all support tickets
+- Create a new support ticket
+- View ticket details
+- Add comments to a ticket
+- Assign an agent to a ticket
+- Change ticket status and priority
 
-Wireframes
-
-GitHub repository setup
-
-GitHub Projects Kanban board
-
-Initial task assignment
+### Screens / wireframes
+- Ticket List (Dashboard)
+- Create Ticket
+- Ticket Details
 
 ## Milestone 2
+### Scope
+- Working front-end for login, dashboard, create ticket, and ticket details.
+- Local mock workflow for creating tickets and adding comments.
+- Runnable Node.js backend skeleton with route modules.
+- Relational schema package with SQL `CREATE TABLE` statements.
 
-- Working front-end (core screens, primary workflow; may use mock data).
-- Database design package (ER diagram, SQL CREATE TABLE statements).
-- Back-end setup (Node.js or PHP): project skeleton, runnable server entry point, initial routes/controllers (stubs allowed).
-- Updated GitHub Projects Kanban and activity blog/wiki.
-- README updated with steps to run front-end and back-end locally (see above).
+## Repo structure
+- `frontend/` - static UI pages (`index`, `dashboard`, `create-ticket`, `ticket-details`)
+- `backend/` - Node.js API skeleton (`server.js` + routes)
+- `docs/` - milestone documentation artifacts (`database_schema.sql`, activity log)
 
-## Milestone 3
+## Run locally
 
-- Full-stack integration, testing report, final demo and presentation.
+### Front-end
+1. Open `frontend/index.html` in your browser.
+2. Sign in to navigate to dashboard.
+3. Create and view tickets using browser local storage.
+
+### Back-end
+1. Open a terminal at repo root.
+2. Run `cd backend`
+3. Run `npm install`
+4. Run `npm start`
+5. API base URL: `http://localhost:3000/api`
+
+## API routes (Milestone 2 skeleton)
+- `GET /api/health`
+- `GET /api/tickets`
+- `GET /api/tickets/:ticketId`
+- `POST /api/tickets`
+- `PATCH /api/tickets/:ticketId`
+- `DELETE /api/tickets/:ticketId`
+- `GET /api/tickets/:ticketId/comments`
+- `POST /api/tickets/:ticketId/comments`
+- `GET /api/users`
+
+## Database design artifacts
+- `docs/database_design.md`
+- `docs/database_schema.sql`
+
+## Milestone 2 team work
+- Front-end workflow updates and validation: Sara Aljaafari
+- Database schema + SQL constraints: Efetobore Salubi
+- Backend route skeleton and server setup: Amelie Chu Moy Sang

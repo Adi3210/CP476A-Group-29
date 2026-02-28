@@ -1,0 +1,14 @@
+{
+  "name": "cp476a-group-29-backend",
+  "version": "1.0.0",
+  "description": "Milestone 2 backend skeleton for the CP476A ticketing system",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

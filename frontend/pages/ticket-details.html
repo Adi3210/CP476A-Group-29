@@ -17,15 +17,26 @@
   <main class="container">
     <section class="card">
       <h2 id="ticketTitle">Ticket Details</h2>
+      <p id="ticketMeta" class="muted"></p>
 
       <h3>Description</h3>
       <p id="ticketDesc" class="muted"></p>
 
-      <h3>Comments (Mock)</h3>
-      <ul class="comments">
-        <li><strong>Admin:</strong> Can you share a screenshot?</li>
-        <li><strong>User:</strong> It happens on Chrome and Edge.</li>
-      </ul>
+      <h3>Comments</h3>
+      <ul id="commentsList" class="comments"></ul>
+
+      <form id="addCommentForm">
+        <label>
+          Name
+          <input type="text" name="author" required placeholder="Your name" />
+        </label>
+        <label>
+          Comment
+          <textarea name="message" rows="3" required placeholder="Write a comment..."></textarea>
+        </label>
+        <p id="commentError" class="error" hidden></p>
+        <button class="btn primary" type="submit">Add Comment</button>
+      </form>
     </section>
   </main>
 
