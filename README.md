@@ -68,6 +68,22 @@ Milestone 1 user stories and data planning are in:
 
 - `docs/milestone1.txt`
 
+# How to run locally
+
+Basic steps to run the project on your machine (per Milestone 02 requirements).
+
+**Front-end**
+
+- Open the front-end in a browser: from the repo root, open `frontend/index.html` (or the main entry file) in a browser, or run a local static server from the `frontend/` directory (e.g. `npx serve frontend` or your course-approved method).
+- If the front-end uses a build step, run the documented command from `frontend/` (e.g. `npm install` then `npm start` or `npm run dev`).
+
+**Back-end**
+
+- From the repo root: `cd backend`.
+- Install dependencies (e.g. `npm install` for Node.js, or the equivalent for PHP).
+- Start the server (e.g. `npm start` or `node server.js` for Node; `php -S localhost:8000` or your project’s command for PHP).
+- The README in `backend/` or the project docs may specify the port and any environment variables.
+
 # Project milestones
 
 ## Milestone 1
@@ -81,3 +97,15 @@ GitHub repository setup
 GitHub Projects Kanban board
 
 Initial task assignment
+
+## Milestone 2
+
+- Working front-end (core screens, primary workflow; may use mock data).
+- Database design package (ER diagram, SQL CREATE TABLE statements).
+- Back-end setup (Node.js or PHP): project skeleton, runnable server entry point, initial routes/controllers (stubs allowed).
+- Updated GitHub Projects Kanban and activity blog/wiki.
+- README updated with steps to run front-end and back-end locally (see above).
+
+## Milestone 3
+
+- Full-stack integration, testing report, final demo and presentation.
