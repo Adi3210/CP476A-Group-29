@@ -63,9 +63,46 @@ Teams, small businesses, and student groups often lack a simple, centralized sys
 
 ## Database design artifacts
 - `docs/database_design.md`
-- `docs/database_schema.sql`
+-  `docs/database_schema.sql`
 
 ## Milestone 2 team work
 - Front-end workflow updates and validation: Sara Aljaafari
 - Database schema + SQL constraints: Amelie Chu Moy Sang
 - Backend route skeleton and server setup: Efetobore Salubi
+
+## Milestone 3
+## Overview
+This project is a full-stack ticketing system built with:
+- Frontend: HTML, CSS, JavaScript
+- Backend: Node.js + Express
+- Database: MySQL
+- 
+The system supports authentication, ticket creation, ticket viewing, ticket details, and commenting.
+
+## Prerequisites
+Please install the following on a clean machine:
+- Node.js (LTS recommended)
+- MySQL Server
+- MySQL Workbench
+- Git
+- VS Code with Live Server extension (recommended for frontend)
+
+## 1. Clone the repository
+```bash
+git clone <REPOSITORY_URL>
+cd <REPOSITORY_FOLDER>
+
+## 2. Set up the database
+Open MySQL Workbench and create a database named: ticketing_system
+Then run the following files in order:
+- database_schema.sql
+- seed_data.sql
+
+## 3. Configure the backend
+Inside the backend folder, create a db.js file (or update the existing one) with your local MySQL credentials.
+
+Then:
+- Start the backend using 'node server.js'
+- The backend should run on: http://localhost:3000
+- Open the frontend folder and run index.html using Live Server in VS Code.
+- The frontend page should open in the browser
