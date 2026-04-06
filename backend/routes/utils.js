@@ -1,7 +1,7 @@
 
-const ALLOWED_PRIORITIES = ["Low", "Medium", "High"];
-const ALLOWED_STATUSES = ["Open", "In Progress", "Closed"];
-const ALLOWED_CATEGORIES = ["Bug", "Request", "Support"];
+const ALLOWED_PRIORITIES = ["low", "medium", "high", "critical"];
+const ALLOWED_STATUSES   = ["open", "in_progress", "resolved", "closed"];
+const ALLOWED_CATEGORIES = ["bug", "feature_request", "question", "other"];
 
 function normalizeLabel(value) {
   return String(value || "").trim().toLowerCase();
@@ -14,13 +14,13 @@ function matchesEnum(value, allowedValues) {
 
 function validateNewTicket(payload) {
   const errors = [];
-  const title = String(payload.title || "").trim();
+  const title       = String(payload.title || "").trim();
   const description = String(payload.description || "").trim();
-  const priority = matchesEnum(payload.priority, ALLOWED_PRIORITIES);
-  const category = matchesEnum(payload.category, ALLOWED_CATEGORIES);
+  const priority    = matchesEnum(payload.priority, ALLOWED_PRIORITIES);
+  const category    = matchesEnum(payload.category, ALLOWED_CATEGORIES);
 
-  if (title.length < 5 || title.length > 120) {
-    errors.push("Title must be between 5 and 120 characters.");
+  if (title.length < 5 || title.length > 200) {
+    errors.push("Title must be between 5 and 200 characters.");
   }
 
   if (description.length < 10 || description.length > 2000) {
@@ -42,7 +42,7 @@ function validateNewTicket(payload) {
       description,
       priority,
       category,
-      requesterId: Number(payload.requesterId) || null
+      createdBy: Number(payload.createdBy) || null
     }
   };
 }
@@ -69,19 +69,19 @@ function validateTicketPatch(payload) {
     }
   }
 
-  if (Object.prototype.hasOwnProperty.call(payload, "assigneeId")) {
-    const assigneeId = Number(payload.assigneeId);
-    if (!Number.isInteger(assigneeId) || assigneeId <= 0) {
-      errors.push("assigneeId must be a positive integer.");
+  if (Object.prototype.hasOwnProperty.call(payload, "assignedTo")) {
+    const assignedTo = Number(payload.assignedTo);
+    if (!Number.isInteger(assignedTo) || assignedTo <= 0) {
+      errors.push("assignedTo must be a positive integer.");
     } else {
-      value.assigneeId = assigneeId;
+      value.assignedTo = assignedTo;
     }
   }
 
   if (Object.prototype.hasOwnProperty.call(payload, "title")) {
     const title = String(payload.title || "").trim();
-    if (title.length < 5 || title.length > 120) {
-      errors.push("Title must be between 5 and 120 characters.");
+    if (title.length < 5 || title.length > 200) {
+      errors.push("Title must be between 5 and 200 characters.");
     } else {
       value.title = title;
     }

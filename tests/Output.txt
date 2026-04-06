@@ -1,0 +1,314 @@
+Live API Output (MySQL Backend)
+Server: http://localhost:3000
+Database: ticketing_db (MySQL 8.0)
+
+
+--- 1. LOGIN (POST /api/auth/login) ---
+
+Request:
+  POST http://localhost:3000/api/auth/login
+  Body: { "email": "agent@example.com", "password": "password123" }
+
+Response (200 OK):
+  {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": 2,
+      "firstName": "Help Desk",
+      "lastName": "Agent",
+      "name": "Help Desk Agent",
+      "email": "agent@example.com",
+      "role": "agent"
+    }
+  }
+
+
+--- 2. GET ALL TICKETS (GET /api/tickets) ---
+
+Request:
+  GET http://localhost:3000/api/tickets
+  Authorization: Bearer <token>
+
+Response (200 OK):
+  {
+    "data": [
+      {
+        "id": 3,
+        "ticketCode": "T-1003",
+        "title": "New feature request",
+        "description": "Please add export to PDF functionality",
+        "status": "resolved",
+        "priority": "critical",
+        "category": "feature_request",
+        "createdBy": 2,
+        "createdByName": "Help Desk Agent",
+        "assignedTo": null,
+        "assignedToName": null,
+        "createdAt": "2026-04-06T01:19:27.000Z",
+        "updatedAt": "2026-04-06T01:21:52.000Z",
+        "resolvedAt": "2026-04-06T01:21:52.000Z"
+      },
+      {
+        "id": 1,
+        "ticketCode": "T-1001",
+        "title": "Cannot login",
+        "description": "User enters valid credentials but is redirected to login page.",
+        "status": "open",
+        "priority": "high",
+        "category": "question",
+        "createdBy": 1,
+        "createdByName": "Student User",
+        "assignedTo": 2,
+        "assignedToName": "Help Desk Agent",
+        "createdAt": "2026-04-06T01:19:27.000Z",
+        "updatedAt": "2026-04-06T01:19:27.000Z",
+        "resolvedAt": null
+      },
+      {
+        "id": 2,
+        "ticketCode": "T-1002",
+        "title": "Validation bug on create form",
+        "description": "Special characters break title validation on create ticket form.",
+        "status": "in_progress",
+        "priority": "medium",
+        "category": "bug",
+        "createdBy": 1,
+        "createdByName": "Student User",
+        "assignedTo": 2,
+        "assignedToName": "Help Desk Agent",
+        "createdAt": "2026-04-06T01:19:27.000Z",
+        "updatedAt": "2026-04-06T01:19:27.000Z",
+        "resolvedAt": null
+      }
+    ],
+    "count": 3
+  }
+
+
+--- 3. GET SINGLE TICKET (GET /api/tickets/T-1001) ---
+
+Request:
+  GET http://localhost:3000/api/tickets/T-1001
+  Authorization: Bearer <token>
+
+Response (200 OK):
+  {
+    "data": {
+      "id": 1,
+      "ticketCode": "T-1001",
+      "title": "Cannot login",
+      "description": "User enters valid credentials but is redirected to login page.",
+      "status": "open",
+      "priority": "high",
+      "category": "question",
+      "createdBy": 1,
+      "createdByName": "Student User",
+      "assignedTo": 2,
+      "assignedToName": "Help Desk Agent",
+      "createdAt": "2026-04-06T01:19:27.000Z",
+      "updatedAt": "2026-04-06T01:19:27.000Z",
+      "resolvedAt": null
+    }
+  }
+
+
+--- 4. GET ALL USERS (GET /api/users) ---
+
+Request:
+  GET http://localhost:3000/api/users
+  Authorization: Bearer <token>
+
+Response (200 OK):
+  {
+    "data": [
+      {
+        "id": 1,
+        "firstName": "Student",
+        "lastName": "User",
+        "name": "Student User",
+        "email": "student@example.com",
+        "role": "submitter",
+        "isActive": true,
+        "lastLogin": "2026-04-06T01:20:15.000Z",
+        "createdAt": "2026-04-06T01:19:27.000Z"
+      },
+      {
+        "id": 2,
+        "firstName": "Help Desk",
+        "lastName": "Agent",
+        "name": "Help Desk Agent",
+        "email": "agent@example.com",
+        "role": "agent",
+        "isActive": true,
+        "lastLogin": "2026-04-06T01:25:21.000Z",
+        "createdAt": "2026-04-06T01:19:27.000Z"
+      }
+    ],
+    "count": 2
+  }
+
+
+--- 5. CREATE TICKET (POST /api/tickets) ---
+
+Request:
+  POST http://localhost:3000/api/tickets
+  Authorization: Bearer <token>
+  Body: {
+    "title": "Printer not working on floor 2",
+    "description": "The shared printer on floor 2 is offline and not responding to jobs.",
+    "priority": "medium",
+    "category": "question"
+  }
+
+Response (201 Created):
+  {
+    "data": {
+      "id": 4,
+      "ticketCode": "T-1004",
+      "title": "Printer not working on floor 2",
+      "description": "The shared printer on floor 2 is offline and not responding to jobs.",
+      "status": "open",
+      "priority": "medium",
+      "category": "question",
+      "createdBy": 2,
+      "createdByName": "Help Desk Agent",
+      "assignedTo": null,
+      "assignedToName": null,
+      "createdAt": "2026-04-06T01:25:21.000Z",
+      "updatedAt": "2026-04-06T01:25:21.000Z",
+      "resolvedAt": null
+    }
+  }
+
+
+--- 6. UPDATE TICKET (PATCH /api/tickets/4) ---
+
+Request:
+  PATCH http://localhost:3000/api/tickets/4
+  Authorization: Bearer <token>
+  Body: { "status": "in_progress", "assignedTo": 2 }
+
+Response (200 OK):
+  {
+    "data": {
+      "id": 4,
+      "ticketCode": "T-1004",
+      "status": "in_progress",
+      "assignedTo": 2,
+      "assignedToName": "Help Desk Agent",
+      "updatedAt": "2026-04-06T01:25:22.000Z",
+      "resolvedAt": null
+      ...
+    }
+  }
+
+
+--- 7. ADD COMMENT (POST /api/tickets/4/comments) ---
+
+Request:
+  POST http://localhost:3000/api/tickets/4/comments
+  Authorization: Bearer <token>
+  Body: { "message": "I will check on the printer shortly." }
+
+Response (201 Created):
+  {
+    "data": {
+      "id": 3,
+      "ticketId": 4,
+      "userId": 2,
+      "authorName": "Help Desk Agent",
+      "message": "I will check on the printer shortly.",
+      "isInternal": false,
+      "createdAt": "2026-04-06T01:25:22.000Z",
+      "updatedAt": "2026-04-06T01:25:22.000Z"
+    }
+  }
+
+
+--- 8. GET COMMENTS (GET /api/tickets/4/comments) ---
+
+Request:
+  GET http://localhost:3000/api/tickets/4/comments
+  Authorization: Bearer <token>
+
+Response (200 OK):
+  {
+    "data": [
+      {
+        "id": 3,
+        "ticketId": 4,
+        "userId": 2,
+        "authorName": "Help Desk Agent",
+        "message": "I will check on the printer shortly.",
+        "isInternal": false,
+        "createdAt": "2026-04-06T01:25:22.000Z",
+        "updatedAt": "2026-04-06T01:25:22.000Z"
+      }
+    ],
+    "count": 1
+  }
+
+
+--- 9. RESOLVE TICKET (PATCH /api/tickets/4) ---
+
+Request:
+  PATCH http://localhost:3000/api/tickets/4
+  Authorization: Bearer <token>
+  Body: { "status": "resolved" }
+
+Response (200 OK):
+  {
+    "data": {
+      "id": 4,
+      "ticketCode": "T-1004",
+      "status": "resolved",
+      "resolvedAt": "2026-04-06T01:25:22.000Z",
+      ...
+    }
+  }
+
+
+--- 10. NO AUTH (should return 401) ---
+
+Request:
+  GET http://localhost:3000/api/tickets
+  (no Authorization header)
+
+Response (401 Unauthorized):
+  { "error": "Authentication required." }
+
+
+--- 11. WRONG PASSWORD (should return 401) ---
+
+Request:
+  POST http://localhost:3000/api/auth/login
+  Body: { "email": "agent@example.com", "password": "wrongpassword" }
+
+Response (401 Unauthorized):
+  { "error": "Invalid email or password." }
+
+
+
+
+MYSQL DATABASE STATE (after all requests above)
+
+ticketing_db > SELECT * FROM tickets;
+
+  ticket_id | ticket_code | status      | priority | category
+  ----------+-------------+-------------+----------+----------------
+  1         | T-1001      | open        | high     | question
+  2         | T-1002      | in_progress | medium   | bug
+  3         | T-1003      | resolved    | critical | feature_request
+  4         | T-1004      | resolved    | medium   | question
+
+
+ticketing_db > SELECT * FROM ticket_history;
+
+  history_id | field_changed | old_value   | new_value
+  -----------+---------------+-------------+-----------
+  1          | status        | open        | resolved
+  2          | status        | open        | in_progress
+  3          | assigned_to   |             | 2
+  4          | status        | in_progress | resolved
+
+

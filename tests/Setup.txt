@@ -1,0 +1,132 @@
+Backend Setup:
+
+Things to Note:
+- The database schema is in docs/database_schema.sql
+- If you need to reset the database, re-run: node scripts/setup_db.js
+  (It will skip seeding if data already exists — drop the DB first
+   in MySQL to do a full reset: DROP DATABASE ticketing_db;)
+- The backend runs on port 3000 by default (change via PORT in .env)
+- Passwords are bcrypt-hashed; never stored in plain text
+- JWT tokens expire after 8 hours by default
+
+Prerequisties:
+- Node.js installed (v18 or later recommended)
+- MySQL 8.0 installed and running locally
+
+1. Clone the repo and install dependencies
+
+  cd backend
+  npm install
+
+2. Configure environment variables
+
+Create a file called .env inside the backend/ folder.
+Copy the contents of .env.example (in the repo root) into it:
+
+  PORT=3000
+  DB_HOST=127.0.0.1
+  DB_PORT=3306
+  DB_USER=root
+  DB_PASSWORD=yourpassword
+  DB_NAME=ticketing_db
+  JWT_SECRET=changethissecretinproduction
+  JWT_EXPIRES_IN=8h
+
+NOTE: Replace DB_PASSWORD with your MySQL root password.
+
+3. Setup the databse
+
+Run the setup script from inside the backend/ folder:
+
+  node scripts/setup_db.js
+
+This will:
+  - Create the ticketing_db database
+  - Create all 4 tables (users, tickets, comments, ticket_history)
+  - Seed 2 test users, 2 sample tickets, and 1 comment
+
+If you see "Setup complete." it worked.
+
+Seeded test accounts:
+  Email:    student@example.com    Role: submitter
+  Email:    agent@example.com      Role: agent
+  Password: password123  (both accounts)
+
+4. Start the backend server.
+
+  node server.js
+
+You should see:
+  Server running on http://localhost:3000
+
+5. Test the API
+
+All routes require a JWT token except login.
+First, get a token:
+
+  POST http://localhost:3000/api/auth/login
+  Body (JSON): { "email": "agent@example.com", "password": "password123" }
+
+Copy the "token" value from the response and include it
+as a header on all subsequent requests:
+
+  Authorization: Bearer <your_token_here>
+
+Available endpoints:
+
+  AUTH
+    POST   /api/auth/login              Log in, returns JWT token
+
+  TICKETS
+    GET    /api/tickets                 List all tickets
+    GET    /api/tickets/:id             Get one ticket (by ID or code e.g. T-1001)
+    POST   /api/tickets                 Create a ticket
+    PATCH  /api/tickets/:id             Update a ticket
+    DELETE /api/tickets/:id             Delete a ticket
+
+  COMMENTS
+    GET    /api/tickets/:id/comments    List comments on a ticket
+    POST   /api/tickets/:id/comments    Add a comment to a ticket
+
+  USERS
+    GET    /api/users                   List all users
+
+--------------------------------------------------------
+EXAMPLE REQUESTS (using curl)
+--------------------------------------------------------
+
+Login:
+  curl -X POST http://localhost:3000/api/auth/login \
+    -H "Content-Type: application/json" \
+    -d "{\"email\":\"agent@example.com\",\"password\":\"password123\"}"
+
+Get all tickets (replace TOKEN with value from login):
+  curl http://localhost:3000/api/tickets \
+    -H "Authorization: Bearer TOKEN"
+
+Create a ticket:
+  curl -X POST http://localhost:3000/api/tickets \
+    -H "Authorization: Bearer TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "{\"title\":\"My new ticket\",\"description\":\"Detailed description here\",\"priority\":\"high\",\"category\":\"bug\"}"
+
+Update ticket status:
+  curl -X PATCH http://localhost:3000/api/tickets/1 \
+    -H "Authorization: Bearer TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "{\"status\":\"resolved\"}"
+
+Post a comment:
+  curl -X POST http://localhost:3000/api/tickets/1/comments \
+    -H "Authorization: Bearer TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "{\"message\":\"Looking into this now\"}"
+
+
+VALID FIELD VALUES:
+
+  status:   open, in_progress, resolved, closed
+  priority: low, medium, high, critical
+  category: bug, feature_request, question, other
+  role:     submitter, agent, admin
+

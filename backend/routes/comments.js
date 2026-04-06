@@ -8,12 +8,14 @@ const router = express.Router({ mergeParams: true });
 
 function mapComment(row) {
   return {
-    id: row.comment_id,
-    ticketId: row.ticket_id,
-    authorId: row.author_id,
+    id:         row.comment_id,
+    ticketId:   row.ticket_id,
+    userId:     row.user_id,
     authorName: row.author_name || "Unknown",
-    message: row.body,
-    createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : row.created_at
+    message:    row.content,
+    isInternal: row.is_internal === 1 || row.is_internal === true,
+    createdAt:  row.created_at instanceof Date ? row.created_at.toISOString() : row.created_at,
+    updatedAt:  row.updated_at instanceof Date ? row.updated_at.toISOString() : row.updated_at
   };
 }
 
@@ -31,9 +33,11 @@ router.get("/", requireAuth, async (req, res, next) => {
     }
 
     const [rows] = await pool.query(
-      `SELECT c.comment_id, c.ticket_id, c.author_id, u.full_name AS author_name, c.body, c.created_at
+      `SELECT c.comment_id, c.ticket_id, c.user_id,
+              CONCAT(u.first_name, ' ', u.last_name) AS author_name,
+              c.content, c.is_internal, c.created_at, c.updated_at
        FROM comments c
-       LEFT JOIN users u ON c.author_id = u.user_id
+       LEFT JOIN users u ON c.user_id = u.user_id
        WHERE c.ticket_id = ?
        ORDER BY c.created_at ASC`,
       [tickets[0].ticket_id]
@@ -64,12 +68,13 @@ router.post("/", requireAuth, async (req, res, next) => {
       return;
     }
 
-    const ticketId = tickets[0].ticket_id;
-    const authorId = req.user.userId;
+    const ticketId  = tickets[0].ticket_id;
+    const userId    = req.user.userId;
+    const isInternal = req.body.isInternal === true || req.body.isInternal === "true" ? 1 : 0;
 
     const [result] = await pool.query(
-      "INSERT INTO comments (ticket_id, author_id, body) VALUES (?, ?, ?)",
-      [ticketId, authorId, value.message]
+      "INSERT INTO comments (content, is_internal, ticket_id, user_id) VALUES (?, ?, ?, ?)",
+      [value.message, isInternal, ticketId, userId]
     );
 
     await pool.query(
@@ -78,9 +83,11 @@ router.post("/", requireAuth, async (req, res, next) => {
     );
 
     const [[comment]] = await pool.query(
-      `SELECT c.comment_id, c.ticket_id, c.author_id, u.full_name AS author_name, c.body, c.created_at
+      `SELECT c.comment_id, c.ticket_id, c.user_id,
+              CONCAT(u.first_name, ' ', u.last_name) AS author_name,
+              c.content, c.is_internal, c.created_at, c.updated_at
        FROM comments c
-       LEFT JOIN users u ON c.author_id = u.user_id
+       LEFT JOIN users u ON c.user_id = u.user_id
        WHERE c.comment_id = ?`,
       [result.insertId]
     );
