@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post("/login", async (req, res, next) => {
   try {
-    const email = String(req.body.email || "").trim().toLowerCase();
+    const email    = String(req.body.email    || "").trim().toLowerCase();
     const password = String(req.body.password || "");
 
     if (!email || !password) {
@@ -17,7 +17,7 @@ router.post("/login", async (req, res, next) => {
     }
 
     const [rows] = await pool.query(
-      "SELECT user_id, full_name, email, role, password_hash FROM users WHERE email = ?",
+      "SELECT user_id, first_name, last_name, email, role, password FROM users WHERE email = ? AND is_active = TRUE",
       [email]
     );
 
@@ -27,11 +27,14 @@ router.post("/login", async (req, res, next) => {
     }
 
     const user = rows[0];
-    const passwordMatch = await bcrypt.compare(password, user.password_hash);
+    const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
       res.status(401).json({ error: "Invalid email or password." });
       return;
     }
+
+    // Update last_login
+    await pool.query("UPDATE users SET last_login = NOW() WHERE user_id = ?", [user.user_id]);
 
     const token = jwt.sign(
       { userId: user.user_id, email: user.email, role: user.role },
@@ -42,10 +45,12 @@ router.post("/login", async (req, res, next) => {
     res.json({
       token,
       user: {
-        id: user.user_id,
-        name: user.full_name,
-        email: user.email,
-        role: user.role
+        id:        user.user_id,
+        firstName: user.first_name,
+        lastName:  user.last_name,
+        name:      `${user.first_name} ${user.last_name}`,
+        email:     user.email,
+        role:      user.role
       }
     });
   } catch (err) {

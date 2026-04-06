@@ -9,28 +9,29 @@ const router = express.Router();
 const TICKET_SELECT = `
   SELECT t.ticket_id, t.ticket_code, t.title, t.description,
          t.status, t.priority, t.category,
-         t.requester_id, r.full_name AS requester_name,
-         t.assignee_id, a.full_name AS assignee_name,
-         t.created_at, t.updated_at
+         t.created_by, r.first_name AS created_by_first, r.last_name AS created_by_last,
+         t.assigned_to, a.first_name AS assigned_to_first, a.last_name AS assigned_to_last,
+         t.created_at, t.updated_at, t.resolved_at
   FROM tickets t
-  LEFT JOIN users r ON t.requester_id = r.user_id
-  LEFT JOIN users a ON t.assignee_id = a.user_id`;
+  LEFT JOIN users r ON t.created_by  = r.user_id
+  LEFT JOIN users a ON t.assigned_to = a.user_id`;
 
 function mapTicket(row) {
   return {
-    id: row.ticket_id,
-    ticketCode: row.ticket_code,
-    title: row.title,
-    description: row.description,
-    status: row.status,
-    priority: row.priority,
-    category: row.category,
-    requesterId: row.requester_id,
-    requesterName: row.requester_name || null,
-    assigneeId: row.assignee_id || null,
-    assigneeName: row.assignee_name || null,
-    createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : row.created_at,
-    updatedAt: row.updated_at instanceof Date ? row.updated_at.toISOString() : row.updated_at
+    id:              row.ticket_id,
+    ticketCode:      row.ticket_code,
+    title:           row.title,
+    description:     row.description,
+    status:          row.status,
+    priority:        row.priority,
+    category:        row.category,
+    createdBy:       row.created_by,
+    createdByName:   row.created_by_first ? `${row.created_by_first} ${row.created_by_last}` : null,
+    assignedTo:      row.assigned_to || null,
+    assignedToName:  row.assigned_to_first ? `${row.assigned_to_first} ${row.assigned_to_last}` : null,
+    createdAt:       row.created_at  instanceof Date ? row.created_at.toISOString()  : row.created_at,
+    updatedAt:       row.updated_at  instanceof Date ? row.updated_at.toISOString()  : row.updated_at,
+    resolvedAt:      row.resolved_at instanceof Date ? row.resolved_at.toISOString() : (row.resolved_at || null)
   };
 }
 
@@ -91,18 +92,15 @@ router.post("/", requireAuth, async (req, res, next) => {
       return;
     }
 
-    // Generate next ticket code from DB
-    const [[{ maxNum }]] = await pool.query(
-      "SELECT COALESCE(MAX(CAST(SUBSTRING(ticket_code, 3) AS UNSIGNED)), 1000) AS maxNum FROM tickets WHERE ticket_code LIKE 'T-%'"
-    );
-    const ticketCode = `T-${maxNum + 1}`;
+    const createdBy = value.createdBy || req.user.userId;
 
-    const requesterId = value.requesterId || req.user.userId;
-
+    // Insert with placeholder, then set ticket_code from insertId
     const [result] = await pool.query(
-      "INSERT INTO tickets (ticket_code, title, description, status, priority, category, requester_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [ticketCode, value.title, value.description, "Open", value.priority, value.category, requesterId]
+      "INSERT INTO tickets (ticket_code, title, description, status, priority, category, created_by) VALUES ('PENDING', ?, ?, 'open', ?, ?, ?)",
+      [value.title, value.description, value.priority, value.category, createdBy]
     );
+    const ticketCode = `T-${1000 + result.insertId}`;
+    await pool.query("UPDATE tickets SET ticket_code = ? WHERE ticket_id = ?", [ticketCode, result.insertId]);
 
     const [[ticket]] = await pool.query(
       TICKET_SELECT + " WHERE t.ticket_id = ?",
@@ -119,7 +117,7 @@ router.patch("/:ticketId", requireAuth, async (req, res, next) => {
   try {
     const id = req.params.ticketId;
     const [existing] = await pool.query(
-      "SELECT ticket_id, status FROM tickets WHERE ticket_id = ? OR ticket_code = ?",
+      "SELECT ticket_id, status, priority, assigned_to FROM tickets WHERE ticket_id = ? OR ticket_code = ?",
       [id, id]
     );
     if (existing.length === 0) {
@@ -134,24 +132,44 @@ router.patch("/:ticketId", requireAuth, async (req, res, next) => {
     }
 
     const ticketId = existing[0].ticket_id;
-    const oldStatus = existing[0].status;
-
     const setClauses = [];
     const params = [];
-    if (value.title !== undefined) { setClauses.push("title = ?"); params.push(value.title); }
-    if (value.description !== undefined) { setClauses.push("description = ?"); params.push(value.description); }
-    if (value.status !== undefined) { setClauses.push("status = ?"); params.push(value.status); }
-    if (value.priority !== undefined) { setClauses.push("priority = ?"); params.push(value.priority); }
-    if (value.assigneeId !== undefined) { setClauses.push("assignee_id = ?"); params.push(value.assigneeId); }
-    params.push(ticketId);
 
+    if (value.title       !== undefined) { setClauses.push("title = ?");        params.push(value.title); }
+    if (value.description !== undefined) { setClauses.push("description = ?");  params.push(value.description); }
+    if (value.status      !== undefined) { setClauses.push("status = ?");       params.push(value.status); }
+    if (value.priority    !== undefined) { setClauses.push("priority = ?");     params.push(value.priority); }
+    if (value.assignedTo  !== undefined) { setClauses.push("assigned_to = ?");  params.push(value.assignedTo); }
+
+    // Set resolved_at when status transitions to resolved
+    if (value.status === "resolved" && existing[0].status !== "resolved") {
+      setClauses.push("resolved_at = NOW()");
+    } else if (value.status && value.status !== "resolved") {
+      setClauses.push("resolved_at = NULL");
+    }
+
+    params.push(ticketId);
     await pool.query(`UPDATE tickets SET ${setClauses.join(", ")} WHERE ticket_id = ?`, params);
 
-    // Record status change in audit history
-    if (value.status && value.status !== oldStatus) {
+    // Record any changed fields in ticket_history
+    const changedBy = req.user.userId;
+    const historyEntries = [];
+    if (value.status !== undefined && value.status !== existing[0].status) {
+      historyEntries.push([ticketId, changedBy, "status", existing[0].status, value.status]);
+    }
+    if (value.priority !== undefined && value.priority !== existing[0].priority) {
+      historyEntries.push([ticketId, changedBy, "priority", existing[0].priority, value.priority]);
+    }
+    if (value.assignedTo !== undefined && value.assignedTo !== existing[0].assigned_to) {
+      historyEntries.push([ticketId, changedBy, "assigned_to",
+        String(existing[0].assigned_to ?? ""),
+        String(value.assignedTo)
+      ]);
+    }
+    for (const entry of historyEntries) {
       await pool.query(
-        "INSERT INTO ticket_status_history (ticket_id, old_status, new_status, changed_by) VALUES (?, ?, ?, ?)",
-        [ticketId, oldStatus, value.status, req.user.userId]
+        "INSERT INTO ticket_history (ticket_id, changed_by, field_changed, old_value, new_value) VALUES (?, ?, ?, ?, ?)",
+        entry
       );
     }
 
