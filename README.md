@@ -88,7 +88,7 @@ Please install the following on a clean machine:
 - VS Code with Live Server extension (recommended for frontend)
 
 ## 1. Clone the repository
-```bash
+bash
 git clone <REPOSITORY_URL>
 cd <REPOSITORY_FOLDER>
 
